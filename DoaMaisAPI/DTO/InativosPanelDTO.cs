@@ -1,8 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
-
-namespace DoaMaisAPI.DTO
+﻿namespace DoaMaisAPI.DTO
 {
-    public class PublicadosPanelDTO
+    public class InativosPanelDTO
     {
         public int ID { get; set; }
         public string Nome { get; set; }
@@ -11,6 +9,6 @@ namespace DoaMaisAPI.DTO
         public string Descricao { get; set; }
         public int Quantidade { get; set; }
         public string TipoDeDoacao { get; set; }
-
     }
 }
+

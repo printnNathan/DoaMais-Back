@@ -24,13 +24,41 @@ namespace DoaMaisAPI.Controllers
         }
 
         [HttpGet]
-        [Route("Listarprodutospanel")]
+        [Route("listarprodutospanel")]
         public IActionResult ListarProdutosPanel()
         {
-            var dao = new ListarPublicadoPanelDAO();
+            var dao = new PublicadosPanelDAO();
             var usuarios = dao.ListarPublicadosPanel();
             return Ok(usuarios);
         }
+
+        [HttpGet]
+        [Route("listarexpiradospanel")]
+        public IActionResult ListarExpiradosPanelDAO()
+        {
+            var dao = new ExpiradosPanelDAO();
+            var usuarios = dao.ListarExpiradosPanelDAO();
+            return Ok(usuarios);
+        }
+
+        [HttpGet]
+        [Route("listarinativosPanel")]
+        public IActionResult ListarInativosPanelDAO()
+        {
+            var dao = new InativosPanelDAO();
+            var usuarios = dao.ListarInativosPanelDAO();
+            return Ok(usuarios);
+        }
+
+        [HttpGet]
+        [Route("listarprodutospendentes")]
+        public IActionResult ListarPendentesPanel()
+        {
+            var dao = new PendentesPanelDAO();
+            var usuarios = dao.ListarPendentesPanel();
+            return Ok(usuarios);
+        }
+
 
         [HttpPost]
         [Route("cadastrar")]
