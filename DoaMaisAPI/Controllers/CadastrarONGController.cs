@@ -1,6 +1,7 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using DoaMaisAPI.Azure;
 using DoaMaisAPI.DAO;
 using DoaMaisAPI.DTO;
 using Microsoft.AspNetCore.Http;
@@ -28,7 +29,7 @@ namespace DoaMaisAPI.Controllers
             }
 
             //var azureBlobStorage = new AzureBlobStorage();
-            //usuario.ImagemURL = azureBlobStorage.UploadImage(usuario.Base64);
+            //ong.FotoPerfil = azureBlobStorage.UploadImage(ong.Base64);
 
             dao.Cadastrar(ong);
             return Ok();

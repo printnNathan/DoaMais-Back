@@ -12,6 +12,7 @@ namespace DoaMaisAPI.DTO
         public bool Status { get; set; }
         public ONGDTO ONG{ get; set; }                              
         public TipoDoacaoDTO TipoDoacao { get; set; }
+        public List<ImagemPedidoDoacaoDTO> ImagensPedido { get; set; }
 
     }
 }

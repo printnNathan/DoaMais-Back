@@ -1,4 +1,5 @@
-﻿using DoaMaisAPI.DTO;
+﻿using DoaMaisAPI.Controllers;
+using DoaMaisAPI.DTO;
 using MySql.Data.MySqlClient;
 
 namespace DoaMaisAPI.DAO
@@ -15,15 +16,18 @@ namespace DoaMaisAPI.DAO
                         SELECT LAST_INSERT_ID();
                         ";
 
-           var comando = new MySqlCommand(query, conexao);
+            var comando = new MySqlCommand(query, conexao);
             comando.Parameters.AddWithValue("@titulo", Pedidos.Titulo);
             comando.Parameters.AddWithValue("@id_tipo", Pedidos.ID_Tipo);
             comando.Parameters.AddWithValue("@descricao", Pedidos.Descricao);
             comando.Parameters.AddWithValue("@id_ong", Pedidos.ID_ONG);
             comando.Parameters.AddWithValue("@status", Pedidos.Status);
-            
-            comando.ExecuteNonQuery();
+
+            var idPedido = Convert.ToInt32(comando.ExecuteScalar());
             conexao.Close();
+
+
+            CadastrarImagensPedido(idPedido, Pedidos.ImagensPedido); //Pegar o id do pedido que eu inseri e passar ele para cá 
         }
 
         public List<PedidoDoacaoDTO> ListarPedidosDoacao()
@@ -52,6 +56,25 @@ namespace DoaMaisAPI.DAO
             conexao.Close();
 
             return comandos;
+        }
+
+        public void CadastrarImagensPedido(int idPedido, List<ImagemPedidoDoacaoDTO> imagens)
+        {
+            var conexao = ConnectionFactory.Build();
+            conexao.Open();
+
+            var query = @"INSERT INTO ImagensPedidoDoacao (Link, ID_PedidoDoacao) 
+                         VALUES (@link, @pedido);";
+
+            foreach (var imagem in imagens)
+            {
+                var comando = new MySqlCommand(query, conexao);
+                comando.Parameters.AddWithValue("@link", imagem.Link); 
+                comando.Parameters.AddWithValue("@pedido", idPedido);
+
+                comando.ExecuteNonQuery();
+            }
+            conexao.Close();
         }
     }
 }
