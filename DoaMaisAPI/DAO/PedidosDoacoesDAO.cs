@@ -11,17 +11,17 @@ namespace DoaMaisAPI.DAO
             conexao.Open();
 
             var query = @"INSERT INTO PedidosDoacao (Titulo, ID_Tipo, Descricao, ID_ONG, Status) 
-                      VALUES (@titulo, @id_tipo, @descricao, @id_ong, @status);
-                      SELECT LAST_INSERT_ID();
-                    ";
+                         VALUES (@titulo, @id_tipo, @descricao, @id_ong, @status);
+                        SELECT LAST_INSERT_ID();
+                        ";
 
-            var comando = new MySqlCommand(query, conexao);
+           var comando = new MySqlCommand(query, conexao);
             comando.Parameters.AddWithValue("@titulo", pedido.Titulo);
             comando.Parameters.AddWithValue("@id_tipo", pedido.ID_Tipo);
             comando.Parameters.AddWithValue("@descricao", pedido.Descricao);
             comando.Parameters.AddWithValue("@id_ong", pedido.ID_ONG);
             comando.Parameters.AddWithValue("@status", pedido.Status ? 1 : 1);
-
+            
             // Executar a query e obter o ID inserido
             int pedidoID = Convert.ToInt32(comando.ExecuteScalar());
 
