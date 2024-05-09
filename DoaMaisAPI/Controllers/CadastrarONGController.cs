@@ -28,21 +28,15 @@ namespace DoaMaisAPI.Controllers
                 return Conflict(mensagem);
             }
 
-            //var azureBlobStorage = new AzureBlobStorage();
-            //ong.FotoPerfil = azureBlobStorage.UploadImage(ong.Base64);
+
+            if (ong.Base64 is not null)
+            {
+                var azureBlobStorage = new AzureBlobStorage();
+                ong.FotoPerfil = azureBlobStorage.UploadImage(ong.Base64);
+            }
 
             dao.Cadastrar(ong);
             return Ok();
-        }
-
-
-        [HttpGet]
-        public IActionResult Get()
-        {
-            var dao = new ONGDAO();
-            var usuarios = dao.ListarInfoONGs();
-
-            return Ok(usuarios);
         }
 
         internal List<ONGDTO> Listar()
@@ -50,7 +44,7 @@ namespace DoaMaisAPI.Controllers
             var conexao = ConnectionFactory.Build();
             conexao.Open();
 
-            var query = "SELECT * FROM Usuarios";
+            var query = "SELECT * FROM ONGs";
 
             var comando = new MySqlCommand(query, conexao);
 

@@ -18,5 +18,15 @@ namespace DoaMaisAPI.Controllers
             return Ok();
         }
 
+        [HttpGet]
+        [Route("listarPorID")]
+        public IActionResult ListarDoacoesPorID(int id)
+        {
+            var dao = new ONGDAO();
+            var ong = dao.ListarOngsPorID(id);
+
+            return Ok(ong);
+
+        }
     }
 }
