@@ -6,8 +6,8 @@ namespace DoaMaisAPI.DAO
     {
         public static MySqlConnection Build()
         {
-            var connectionString = "Server=localhost;Database=DoaMais;Uid=root;Pwd=root;";
-            return new MySqlConnection(connectionString);
+            return new MySqlConnection("Server=localhost;Database=DoaMais;Uid=root;Pwd=root;");
+        //    return new MySqlConnection(connectionString);
         }
     }
 }

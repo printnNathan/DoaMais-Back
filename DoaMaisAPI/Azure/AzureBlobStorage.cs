@@ -15,8 +15,8 @@ namespace DoaMaisAPI.Azure
             var fileName = Guid.NewGuid().ToString() + ".jpg";
 
             // Limpa o hash enviado
-            //var data = new Regex(@"^data:image\/[a-z]+;base64,").Replace(image, "");
-            var data = image;
+            var data = new Regex(@"^data:image\/[a-z]+;base64,").Replace(image, "");
+          
 
             // Gera um array de Bytes
             byte[] imageBytes = Convert.FromBase64String(data);

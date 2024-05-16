@@ -4,6 +4,7 @@ using System.Text;
 using DoaMaisAPI.Azure;
 using DoaMaisAPI.DAO;
 using DoaMaisAPI.DTO;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -38,25 +39,40 @@ namespace DoaMaisAPI.Controllers
         //    return Ok();
         //}
 
+        //[HttpPost]
+        //public IActionResult ListarInfoONGs()
+        //{
+        //    var dao = new ONGDAO();
+        //    var ong = dao.ListarInfoONGs();
+
+        //    return Ok(ong);
+        //}
+
+
         [HttpGet]
-        public IActionResult ListarInfoONGs()
+        [Route("listarPorID")]
+        [Authorize]
+        public IActionResult ListarOngsPorID()
         {
-            var dao = new ONGDAO();
-            var ong = dao.ListarInfoONGs();
+            //Pegando ID do token
+            int id = int.Parse(HttpContext.User.FindFirst("id")?.Value);
 
-            return Ok(ong);
-        }
-
-
-        [HttpGet]
-        [Route("listarPorID")] 
-        public IActionResult ListarOngsPorID(int id)
-        {
             var dao = new ONGDAO();
             var ong = dao.ListarOngsPorID(id);
 
             return Ok(ong);
 
+        }
+
+        [HttpGet]
+        [Route("listarONGs")]
+
+        public IActionResult ListarInfoONGs()
+        {
+            var dao = new ONGDAO();
+            var ONGs = dao.ListarInfoONGs();
+
+            return Ok(ONGs);
         }
 
     }

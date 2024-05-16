@@ -9,29 +9,51 @@ namespace DoaMaisAPI.Controllers
     [ApiController]
     public class PedidosDoacaoController : ControllerBase
     {
+        //[HttpPost]
+        //[Route("CadastrarPedidos")]
+        //public IActionResult CadastrarPedidos(PedidoDoacaoDTO Pedidos)
+        //{
+        //    CadastrarUrls de imgs
+
+        //    var azureBlobStorag = new AzureBlobStorage();
+
+        //    foreach (var imagem in Pedidos.ImagensPedido)
+        //    {
+        //        var linkDaImagem = azureBlobStorag.UploadImage(imagem.Link);
+        //        imagem.Link = linkDaImagem;
+        //    }
+
+        //    var statusPendente = new PedidoDoacaoDTO();
+        //    statusPendente.ID = 1; // Tive que alterar por que a minha variavel status é bool
+
+        //    Pedidos.Status = true;
+
+        //    var dao = new PedidosDoacoesDAO();
+        //    dao.CadastrarPedidos(Pedidos);
+
+        //    return Ok();
+        //}
         [HttpPost]
-        public IActionResult CadastrarPedidos(PedidoDoacaoDTO Pedidos)
+        [Route("cadastrarpedido")]
+        public IActionResult CadastrarPedidos([FromBody] PedidoDoacaoDTO pedido)
         {
-            //CadastrarUrls de imgs
 
-            var azureBlobStorag = new AzureBlobStorage();
-
-            foreach (var imagem in Pedidos.ImagensPedido)
-            {
-                var linkDaImagem = azureBlobStorag.UploadImage(imagem.Link);
-                imagem.Link = linkDaImagem;
-            }
-
-            var statusPendente = new PedidoDoacaoDTO();
-            //statusPendente.ID = 1; // Tive que alterar por que a minha variavel status é bool
-
-            Pedidos.Status = true;
 
             var dao = new PedidosDoacoesDAO();
-            dao.CadastrarPedidos(Pedidos);
 
+            if(pedido.ImagensPedido is not null)
+            {
+                foreach (var imagem in pedido.ImagensPedido)
+                {
+                    var azureBlobStorage = new AzureBlobStorage();
+                    imagem.Link = azureBlobStorage.UploadImage(imagem.Base64);
+                }
+            }
+
+            dao.CadastrarPedidos(pedido);
             return Ok();
         }
+
 
         [HttpGet]
         public IActionResult ListarPedidosDoacao()
