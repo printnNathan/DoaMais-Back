@@ -35,28 +35,57 @@ namespace DoaMaisAPI.DAO
             var conexao = ConnectionFactory.Build();
             conexao.Open();
 
-            var query = "SELECT*FROM PedidosDoacao";
+            var query = "SELECT * FROM PedidosDoacao";
 
             var comando = new MySqlCommand(query, conexao);
             var dataReader = comando.ExecuteReader();
 
-            var comandos = new List<PedidoDoacaoDTO>();
+            var pedidos = new List<PedidoDoacaoDTO>();
 
             while (dataReader.Read())
             {
-                var Pedidos = new PedidoDoacaoDTO();
-                Pedidos.ID = int.Parse(dataReader["ID"].ToString());
-                Pedidos.Titulo = dataReader["Titulo"].ToString();
-                Pedidos.Descricao = dataReader["Descricao"].ToString();
-                Pedidos.ID_ONG = int.Parse(dataReader["ID_ONG"].ToString());
-                Pedidos.Status = Convert.ToInt32(dataReader["Status"]) == 1;
+                var pedido = new PedidoDoacaoDTO();
+                pedido.ID = int.Parse(dataReader["ID"].ToString());
+                pedido.Titulo = dataReader["Titulo"].ToString();
+                pedido.Descricao = dataReader["Descricao"].ToString();
+                pedido.ID_ONG = int.Parse(dataReader["ID_ONG"].ToString());
+                pedido.Status = Convert.ToInt32(dataReader["Status"]) == 1;
 
-                comandos.Add(Pedidos);
+                // Listar imagens para este pedido
+                pedido.ImagensPedido = ListarImagensPedido(pedido.ID);
+
+                pedidos.Add(pedido);
             }
+
             conexao.Close();
 
-            return comandos;
+            return pedidos;
         }
+
+        private List<ImagemPedidoDoacaoDTO> ListarImagensPedido(int idPedido)
+        {
+            var conexao = ConnectionFactory.Build();
+            conexao.Open();
+
+            var imagens = new List<ImagemPedidoDoacaoDTO>();
+
+            var query = "SELECT Link FROM ImagensPedidoDoacao WHERE ID_PedidoDoacao = @idPedido";
+            var comando = new MySqlCommand(query, conexao);
+            comando.Parameters.AddWithValue("@idPedido", idPedido);
+            var dataReader = comando.ExecuteReader();
+
+            while (dataReader.Read())
+            {
+                var imagem = new ImagemPedidoDoacaoDTO();
+                imagem.Link = dataReader["Link"].ToString();
+                imagens.Add(imagem);
+            }
+
+            conexao.Close();
+
+            return imagens;
+        }
+
 
         public void CadastrarImagensPedido(int idPedido, List<ImagemPedidoDoacaoDTO> imagens)
         {
