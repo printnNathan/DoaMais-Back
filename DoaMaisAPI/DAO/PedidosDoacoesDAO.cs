@@ -75,9 +75,18 @@ namespace DoaMaisAPI.DAO
             comando.ExecuteNonQuery();
             conexao.Close();
         }
+        public void ReativarPedidoDoacao(int idPedido)
+        {
+            var conexao = ConnectionFactory.Build();
+            conexao.Open();
 
+            var query = "UPDATE PedidosDoacao SET Ativo = 1 WHERE ID = @idPedido";
+            var comando = new MySqlCommand(query, conexao);
+            comando.Parameters.AddWithValue("@idPedido", idPedido);
 
-
+            comando.ExecuteNonQuery();
+            conexao.Close();
+        }
 
         private List<ImagemPedidoDoacaoDTO> ListarImagensPedido(int idPedido)
         {

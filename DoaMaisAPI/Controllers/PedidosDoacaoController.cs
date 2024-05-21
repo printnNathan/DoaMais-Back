@@ -83,5 +83,20 @@ namespace DoaMaisAPI.Controllers
                 return StatusCode(500, new { message = "Erro ao inativar doação", error = ex.Message });
             }
         }
+        [HttpPut("{id}/reativar")]
+        public IActionResult ReativarPedidoDoacao(int id)
+        {
+            try
+            {
+                var pedidosDoacoesDAO = new PedidosDoacoesDAO();
+                pedidosDoacoesDAO.ReativarPedidoDoacao(id);
+                return Ok(new { message = "Doação reativada com sucesso" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Erro ao reativar doação", error = ex.Message });
+            }
+        }
+
     }
 }
