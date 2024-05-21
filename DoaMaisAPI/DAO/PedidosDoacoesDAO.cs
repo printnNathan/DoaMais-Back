@@ -6,15 +6,15 @@ namespace DoaMaisAPI.DAO
 {
     public class PedidosDoacoesDAO
     {
-        internal void CadastrarPedidos(PedidoDoacaoDTO Pedidos)
+        public void CadastrarPedidos(PedidoDoacaoDTO Pedidos)
         {
             var conexao = ConnectionFactory.Build();
             conexao.Open();
 
-            var query = @"INSERT INTO PedidosDoacao (Titulo, ID_Tipo, Descricao, ID_ONG, Status) 
-                         VALUES (@titulo, @id_tipo, @descricao, @id_ong, @status);
-                        SELECT LAST_INSERT_ID();
-                        ";
+            var query = @"INSERT INTO PedidosDoacao (Titulo, ID_Tipo, Descricao, ID_ONG, Status, Ativo) 
+                 VALUES (@titulo, @id_tipo, @descricao, @id_ong, @status, @ativo);
+                 SELECT LAST_INSERT_ID();
+                 ";
 
             var comando = new MySqlCommand(query, conexao);
             comando.Parameters.AddWithValue("@titulo", Pedidos.Titulo);
@@ -22,20 +22,21 @@ namespace DoaMaisAPI.DAO
             comando.Parameters.AddWithValue("@descricao", Pedidos.Descricao);
             comando.Parameters.AddWithValue("@id_ong", Pedidos.ID_ONG);
             comando.Parameters.AddWithValue("@status", Pedidos.Status);
+            comando.Parameters.AddWithValue("@ativo", true);
 
             var idPedido = Convert.ToInt32(comando.ExecuteScalar());
             conexao.Close();
 
-
-            CadastrarImagensPedido(idPedido, Pedidos.ImagensPedido); //Pegar o id do pedido que eu inseri e passar ele para cá 
+            CadastrarImagensPedido(idPedido, Pedidos.ImagensPedido);
         }
+
 
         public List<PedidoDoacaoDTO> ListarPedidosDoacao()
         {
             var conexao = ConnectionFactory.Build();
             conexao.Open();
 
-            var query = "SELECT * FROM PedidosDoacao";
+            var query = "SELECT * FROM PedidosDoacao WHERE Ativo = 1";
 
             var comando = new MySqlCommand(query, conexao);
             var dataReader = comando.ExecuteReader();
@@ -50,6 +51,7 @@ namespace DoaMaisAPI.DAO
                 pedido.Descricao = dataReader["Descricao"].ToString();
                 pedido.ID_ONG = int.Parse(dataReader["ID_ONG"].ToString());
                 pedido.Status = Convert.ToInt32(dataReader["Status"]) == 1;
+                pedido.Ativo = Convert.ToBoolean(dataReader["Ativo"]);
 
                 // Listar imagens para este pedido
                 pedido.ImagensPedido = ListarImagensPedido(pedido.ID);
@@ -61,6 +63,21 @@ namespace DoaMaisAPI.DAO
 
             return pedidos;
         }
+        public void InativarPedidoDoacao(int idPedido)
+        {
+            var conexao = ConnectionFactory.Build();
+            conexao.Open();
+
+            var query = "UPDATE PedidosDoacao SET Ativo = 0 WHERE ID = @idPedido";
+            var comando = new MySqlCommand(query, conexao);
+            comando.Parameters.AddWithValue("@idPedido", idPedido);
+
+            comando.ExecuteNonQuery();
+            conexao.Close();
+        }
+
+
+
 
         private List<ImagemPedidoDoacaoDTO> ListarImagensPedido(int idPedido)
         {

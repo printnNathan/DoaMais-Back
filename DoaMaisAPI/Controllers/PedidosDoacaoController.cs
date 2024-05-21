@@ -63,5 +63,25 @@ namespace DoaMaisAPI.Controllers
 
             return Ok(ONG);
         }
+        private readonly PedidosDoacoesDAO _pedidosDoacoesDAO;
+
+        public PedidosDoacaoController()
+        {
+            _pedidosDoacoesDAO = new PedidosDoacoesDAO();
+        }
+
+        [HttpPut("{id}/inativar")]
+        public IActionResult InativarPedidoDoacao(int id)
+        {
+            try
+            {
+                _pedidosDoacoesDAO.InativarPedidoDoacao(id);
+                return Ok(new { message = "Doação inativada com sucesso" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Erro ao inativar doação", error = ex.Message });
+            }
+        }
     }
 }
