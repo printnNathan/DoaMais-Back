@@ -8,7 +8,6 @@
         public string Descricao { get; set; }
         public int? ID_ONG { get; set; }
         public bool? Status { get; set; }
-      //  public bool? Ativo { get; set; }
         public ONGDTO? ONG { get; set; }
         public TipoDoacaoDTO? TipoDoacao { get; set; }
         public List<ImagemPedidoDoacaoDTO>? ImagensPedido { get; set; }

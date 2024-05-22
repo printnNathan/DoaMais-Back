@@ -110,5 +110,30 @@ namespace DoaMaisAPI.Controllers
 
 
         }
+        [HttpGet]
+        [Route("inativos")]
+        public IActionResult ListarInativos()
+        {
+            try
+            {
+                var dao = new PedidosDoacoesDAO();
+                var pedidosInativos = dao.ListarInativos();
+                return Ok(pedidosInativos);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Erro ao listar pedidos de doação inativos", error = ex.Message });
+            }
+        }
+        [HttpGet]
+        [Route("ong/{ongId}")]
+        public IActionResult ListarPedidosDoacaoPorONG([FromRoute]int ongId)
+        {
+            var dao = new PedidosDoacoesDAO();
+            var pedidosPorONG = dao.ListarPedidosDoacaoPorONG(ongId);
+
+            return Ok(pedidosPorONG);
+        }
+
     }
 }
