@@ -1,6 +1,7 @@
 ﻿using DoaMaisAPI.Azure;
 using DoaMaisAPI.DAO;
 using DoaMaisAPI.DTO;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DoaMaisAPI.Controllers
@@ -41,7 +42,7 @@ namespace DoaMaisAPI.Controllers
 
             var dao = new PedidosDoacoesDAO();
 
-            if(pedido.ImagensPedido is not null)
+            if (pedido.ImagensPedido is not null)
             {
                 foreach (var imagem in pedido.ImagensPedido)
                 {
@@ -98,5 +99,16 @@ namespace DoaMaisAPI.Controllers
             }
         }
 
+        [HttpGet]
+        [Route("listarRequisicaoPorID")]
+        public IActionResult ListarRequisicoesPorID(int id)
+        {
+            var dao = new PedidosDoacoesDAO();
+            var ong = dao.ListarRequisicaoPorID(id);
+
+            return Ok(ong);
+
+
+        }
     }
 }

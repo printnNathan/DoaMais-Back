@@ -1,6 +1,7 @@
 ﻿using DoaMaisAPI.Controllers;
 using DoaMaisAPI.DTO;
 using MySql.Data.MySqlClient;
+using Newtonsoft.Json;
 
 namespace DoaMaisAPI.DAO
 {
@@ -51,7 +52,6 @@ namespace DoaMaisAPI.DAO
                 pedido.Descricao = dataReader["Descricao"].ToString();
                 pedido.ID_ONG = int.Parse(dataReader["ID_ONG"].ToString());
                 pedido.Status = Convert.ToInt32(dataReader["Status"]) == 1;
-                pedido.Ativo = Convert.ToBoolean(dataReader["Ativo"]);
 
                 // Listar imagens para este pedido
                 pedido.ImagensPedido = ListarImagensPedido(pedido.ID);
@@ -104,7 +104,7 @@ namespace DoaMaisAPI.DAO
             {
                 var imagem = new ImagemPedidoDoacaoDTO();
                 imagem.Link = dataReader["Link"].ToString();
-                imagens.Add(imagem);
+                imagens.Add(imagem);    
             }
 
             conexao.Close();
@@ -130,6 +130,46 @@ namespace DoaMaisAPI.DAO
                 comando.ExecuteNonQuery();
             }
             conexao.Close();
+        }
+
+
+        public PedidoDoacaoDTO ListarRequisicaoPorID(int id)
+        {
+            var conexao = ConnectionFactory.Build();
+            conexao.Open();
+
+            var query = "SELECT*FROM pedidosdoacao Where ID =@id";
+
+            var comando = new MySqlCommand(query, conexao);
+            comando.Parameters.AddWithValue("@id", id);
+
+            var dataReader = comando.ExecuteReader();
+
+            var ong = new PedidoDoacaoDTO();
+
+            while (dataReader.Read())
+            {
+                ong.ID = int.Parse(dataReader["ID"].ToString());
+                ong.Titulo = dataReader["Titulo"].ToString();
+                ong.ID_Tipo = int.Parse(dataReader["ID_Tipo"].ToString());
+                ong.Descricao = dataReader["Descricao"].ToString();
+                ong.ID_ONG = int.Parse(dataReader["ID_ONG"].ToString());
+                ong.Status = Convert.ToInt32(dataReader["Status"]) == 1;
+
+                //if (dataReader["ImagensPedido"] != DBNull.Value)
+                //{
+                //    var imagensJson = dataReader["ImagensPedido"].ToString();
+                //    ong.ImagensPedido = JsonConvert.DeserializeObject<List<ImagemPedidoDoacaoDTO>>(imagensJson);
+                //}
+                //else
+                //{
+                //    ong.ImagensPedido = new List<ImagemPedidoDoacaoDTO>();
+                //}
+
+            }
+            conexao.Close();
+
+            return ong;
         }
     }
 }
