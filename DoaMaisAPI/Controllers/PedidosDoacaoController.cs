@@ -111,13 +111,13 @@ namespace DoaMaisAPI.Controllers
 
         }
         [HttpGet]
-        [Route("inativos")]
-        public IActionResult ListarInativos()
+        [Route("inativos/{ongId}")]
+        public IActionResult ListarInativos([FromRoute] int ongId)
         {
             try
             {
                 var dao = new PedidosDoacoesDAO();
-                var pedidosInativos = dao.ListarInativos();
+                var pedidosInativos = dao.ListarInativos(ongId);
                 return Ok(pedidosInativos);
             }
             catch (Exception ex)
@@ -134,6 +134,5 @@ namespace DoaMaisAPI.Controllers
 
             return Ok(pedidosPorONG);
         }
-
     }
 }

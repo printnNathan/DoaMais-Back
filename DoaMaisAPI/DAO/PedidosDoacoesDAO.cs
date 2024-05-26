@@ -161,14 +161,21 @@ namespace DoaMaisAPI.DAO
 
             return ong;
         }
-        public List<PedidoDoacaoDTO> ListarInativos()
+        public List<PedidoDoacaoDTO> ListarInativos(int ongId)
         {
             var conexao = ConnectionFactory.Build();
             conexao.Open();
 
-            var query = "SELECT * FROM PedidosDoacao WHERE Status = 0";
+            var query = @"SELECT 
+                            P.ID, P.Titulo, P.Descricao, P.ID_Tipo, P.ID_ONG, P.Status,
+                            O.Nome, O.Cidade, O.Estado, O.FotoPerfil
+                            FROM PedidosDoacao P
+                            INNER JOIN Ongs O
+                            ON P.ID_ONG = O.ID
+                            WHERE P.ID_ONG = @ongId AND P.Status = 0;";
 
             var comando = new MySqlCommand(query, conexao);
+            comando.Parameters.AddWithValue("@ongId", ongId);
             var dataReader = comando.ExecuteReader();
 
             var pedidos = new List<PedidoDoacaoDTO>();
@@ -181,6 +188,15 @@ namespace DoaMaisAPI.DAO
                 pedido.Descricao = dataReader["Descricao"].ToString();
                 pedido.ID_ONG = int.Parse(dataReader["ID_ONG"].ToString());
                 pedido.Status = Convert.ToInt32(dataReader["Status"]) == 1;
+
+                var ong = new ONGDTO();
+                ong.ID = pedido.ID_ONG.Value;
+                ong.Nome = dataReader["Nome"].ToString();
+                ong.Cidade = dataReader["Cidade"].ToString();
+                ong.Estado = dataReader["Estado"].ToString();
+                ong.FotoPerfil = dataReader["FotoPerfil"].ToString();
+
+                pedido.ONG = ong;
 
                 pedido.ImagensPedido = ListarImagensPedido(pedido.ID);
 
@@ -196,7 +212,13 @@ namespace DoaMaisAPI.DAO
             var conexao = ConnectionFactory.Build();
             conexao.Open();
 
-            var query = "SELECT * FROM PedidosDoacao WHERE ID_ONG = @ongId AND Status = 1";
+            var query = @"SELECT 
+                            P.ID, P.Titulo, P.Descricao, P.ID_Tipo, P.ID_ONG, P.Status,
+                            O.Nome, O.Cidade, O.Estado, O.FotoPerfil
+                            FROM PedidosDoacao P
+                            INNER JOIN Ongs O
+                            ON P.ID_ONG = O.ID
+                            WHERE P.ID_ONG = @ongId AND P.Status = 1;";
 
             var comando = new MySqlCommand(query, conexao);
             comando.Parameters.AddWithValue("@ongId", ongId);
@@ -215,6 +237,15 @@ namespace DoaMaisAPI.DAO
 
                 // Listar imagens para este pedido
                 pedido.ImagensPedido = ListarImagensPedido(pedido.ID);
+
+                var ong = new ONGDTO();
+                ong.ID = pedido.ID_ONG.Value;
+                ong.Nome = dataReader["Nome"].ToString();
+                ong.Cidade = dataReader["Cidade"].ToString();
+                ong.Estado = dataReader["Estado"].ToString();
+                ong.FotoPerfil = dataReader["FotoPerfil"].ToString();
+
+                pedido.ONG = ong;
 
                 pedidos.Add(pedido);
             }
