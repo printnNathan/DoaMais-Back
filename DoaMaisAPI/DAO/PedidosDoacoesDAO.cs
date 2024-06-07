@@ -31,12 +31,21 @@ namespace DoaMaisAPI.DAO
         public List<PedidoDoacaoDTO> ListarPedidosDoacao()
         {
             var pedidos = new List<PedidoDoacaoDTO>();
+            var ongDao = new ONGDAO();
 
             using (var conexao = ConnectionFactory.Build())
             {
                 conexao.Open();
 
-                var query = "SELECT * FROM PedidosDoacao WHERE Status = 1";
+                var query = @"SELECT 
+                                p.* , o.Nome,o.Celular,o.Email,o.Senha,o.Cep,o.Logradouro,
+                                o.Numero,o.Cidade,o.Bairro,o.Complemento,o.Estado,
+                                o.FotoPerfil,o.Biografia 
+                                FROM PedidosDoacao p
+                                INNER JOIN ONGs o
+                                ON p.ID_ONG = o.ID
+                                WHERE Status = 1";
+
                 using (var comando = new MySqlCommand(query, conexao))
                 using (var dataReader = comando.ExecuteReader())
                 {
@@ -51,6 +60,25 @@ namespace DoaMaisAPI.DAO
                             Status = dataReader.GetInt32("Status") == 1,
                             ImagensPedido = ListarImagensPedido(dataReader.GetInt32("ID"))
                         };
+
+
+                        var ong = new ONGDTO();
+                        ong.ID = int.Parse(dataReader["ID"].ToString());
+                        ong.Nome = dataReader["Nome"].ToString();
+                        ong.Celular = dataReader["Celular"].ToString();
+                        ong.Email = dataReader["Email"].ToString();
+                        ong.Senha = dataReader["Senha"].ToString();
+                        ong.Cep = dataReader["Cep"].ToString();
+                        ong.Logradouro = dataReader["Logradouro"].ToString();
+                        ong.Numero = dataReader["Numero"].ToString();
+                        ong.Cidade = dataReader["Cidade"].ToString();
+                        ong.Bairro = dataReader["Bairro"].ToString();
+                        ong.Complemento = dataReader["Complemento"].ToString();
+                        ong.Estado = dataReader["Estado"].ToString();
+                        ong.FotoPerfil = dataReader["FotoPerfil"].ToString();
+                        ong.Biografia = dataReader["Biografia"].ToString();
+
+                        pedido.ONG = ong;
 
                         pedidos.Add(pedido);
                     }
