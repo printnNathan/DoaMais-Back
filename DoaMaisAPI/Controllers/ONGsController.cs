@@ -75,5 +75,21 @@ namespace DoaMaisAPI.Controllers
             return Ok(ONGs);
         }
 
+        [HttpPut]
+        [Route("atualizar")]
+        [Authorize]
+        public IActionResult Atualizar([FromBody] ONGDTO ong)
+        {
+            // Pegando ID do token
+            int id = int.Parse(HttpContext.User.FindFirst("id")?.Value);
+            ong.ID = id;
+
+            var dao = new ONGDAO();
+            dao.Atualizar(ong);
+
+            return Ok();
+        }
+
+
     }
 }

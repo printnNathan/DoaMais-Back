@@ -1,6 +1,6 @@
 ﻿using DoaMaisAPI.DTO;
 using MySql.Data.MySqlClient;
-using Org.BouncyCastle.Utilities;
+using System.Collections.Generic;
 
 namespace DoaMaisAPI.DAO
 {
@@ -11,8 +11,8 @@ namespace DoaMaisAPI.DAO
             var conexao = ConnectionFactory.Build();
             conexao.Open();
 
-            var query = @"INSERT INTO ONGs (Nome, Celular, Email, Senha, Cep, Logradouro, Numero, Cidade, Bairro, Complemento, Estado,FotoPerfil, Biografia) 
-                        VALUES (@nome, @celular, @email, @senha, @cep, @logradouro, @numero, @cidade, @bairro, @complemento, @estado,fotoperfil, @biografia)";
+            var query = @"INSERT INTO ONGs (Nome, Celular, Email, Senha, Cep, Logradouro, Numero, Cidade, Bairro, Complemento, Estado, FotoPerfil, Biografia) 
+                        VALUES (@nome, @celular, @email, @senha, @cep, @logradouro, @numero, @cidade, @bairro, @complemento, @estado, @fotoperfil, @biografia)";
 
             var comando = new MySqlCommand(query, conexao);
             comando.Parameters.AddWithValue("@nome", ong.Nome);
@@ -38,7 +38,7 @@ namespace DoaMaisAPI.DAO
             var conexao = ConnectionFactory.Build();
             conexao.Open();
 
-            var query = "SELECT*FROM ONGs";
+            var query = "SELECT * FROM ONGs";
 
             var comando = new MySqlCommand(query, conexao);
             var dataReader = comando.ExecuteReader();
@@ -49,6 +49,7 @@ namespace DoaMaisAPI.DAO
             {
                 var ONG = new ONGDTO();
                 ONG.ID = int.Parse(dataReader["ID"].ToString());
+                ONG.Nome = dataReader["Nome"].ToString();
                 ONG.Celular = dataReader["Celular"].ToString();
                 ONG.Email = dataReader["Email"].ToString();
                 ONG.Cep = dataReader["Cep"].ToString();
@@ -66,7 +67,6 @@ namespace DoaMaisAPI.DAO
 
             return comandos;
         }
-
 
         public bool VerificarONG(ONGDTO ong)
         {
@@ -127,7 +127,7 @@ namespace DoaMaisAPI.DAO
             var conexao = ConnectionFactory.Build();
             conexao.Open();
 
-            var query = "SELECT*FROM ONGs Where ID =@id";
+            var query = "SELECT * FROM ONGs Where ID = @id";
 
             var comando = new MySqlCommand(query, conexao);
             comando.Parameters.AddWithValue("@id", id);
@@ -138,28 +138,62 @@ namespace DoaMaisAPI.DAO
 
             while (dataReader.Read())
             {
-                    ong.ID = int.Parse(dataReader["ID"].ToString());
-                    ong.Nome = dataReader["Nome"].ToString();
-                    ong.Celular = dataReader["Celular"].ToString();
-                    ong.Email = dataReader["Email"].ToString();
-                    ong.Senha = dataReader["Senha"].ToString();
-                    ong.Cep = dataReader["Cep"].ToString();
-                    ong.Logradouro = dataReader["Logradouro"].ToString();
-                    ong.Numero = dataReader["Numero"].ToString();
-                    ong.Cidade = dataReader["Cidade"].ToString();
-                    ong.Bairro = dataReader["Bairro"].ToString();
-                    ong.Complemento = dataReader["Complemento"].ToString();
-                    ong.Estado = dataReader["Estado"].ToString();
-                    ong.FotoPerfil = dataReader["FotoPerfil"].ToString();
-                    ong.Biografia = dataReader["Biografia"].ToString();
-
+                ong.ID = int.Parse(dataReader["ID"].ToString());
+                ong.Nome = dataReader["Nome"].ToString();
+                ong.Celular = dataReader["Celular"].ToString();
+                ong.Email = dataReader["Email"].ToString();
+                ong.Senha = dataReader["Senha"].ToString();
+                ong.Cep = dataReader["Cep"].ToString();
+                ong.Logradouro = dataReader["Logradouro"].ToString();
+                ong.Numero = dataReader["Numero"].ToString();
+                ong.Cidade = dataReader["Cidade"].ToString();
+                ong.Bairro = dataReader["Bairro"].ToString();
+                ong.Complemento = dataReader["Complemento"].ToString();
+                ong.Estado = dataReader["Estado"].ToString();
+                ong.FotoPerfil = dataReader["FotoPerfil"].ToString();
+                ong.Biografia = dataReader["Biografia"].ToString();
             }
             conexao.Close();
 
             return ong;
         }
 
+        public void Atualizar(ONGDTO ong)
+        {
+            var conexao = ConnectionFactory.Build();
+            conexao.Open();
+
+            var query = @"UPDATE ONGs SET 
+                Nome = @nome,
+                Celular = @celular,
+                Cep = @cep,
+                Logradouro = @logradouro,
+                Numero = @numero,
+                Cidade = @cidade,
+                Bairro = @bairro,
+                Complemento = @complemento,
+                Estado = @estado,
+                FotoPerfil = @fotoperfil,
+                Biografia = @biografia
+                WHERE ID = @id";
+
+            var comando = new MySqlCommand(query, conexao);
+            comando.Parameters.AddWithValue("@id", ong.ID);
+            comando.Parameters.AddWithValue("@nome", ong.Nome);
+            comando.Parameters.AddWithValue("@celular", ong.Celular);
+            comando.Parameters.AddWithValue("@cep", ong.Cep);
+            comando.Parameters.AddWithValue("@logradouro", ong.Logradouro);
+            comando.Parameters.AddWithValue("@numero", ong.Numero);
+            comando.Parameters.AddWithValue("@cidade", ong.Cidade);
+            comando.Parameters.AddWithValue("@bairro", ong.Bairro);
+            comando.Parameters.AddWithValue("@complemento", ong.Complemento);
+            comando.Parameters.AddWithValue("@estado", ong.Estado);
+            comando.Parameters.AddWithValue("@fotoperfil", ong.FotoPerfil);
+            comando.Parameters.AddWithValue("@biografia", ong.Biografia);
+
+            comando.ExecuteNonQuery();
+            conexao.Close();
+        }
 
     }
-}   
-               
+}
