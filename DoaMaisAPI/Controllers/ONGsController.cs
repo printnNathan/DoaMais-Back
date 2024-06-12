@@ -4,6 +4,7 @@ using System.Text;
 using DoaMaisAPI.Azure;
 using DoaMaisAPI.DAO;
 using DoaMaisAPI.DTO;
+using K4os.Compression.LZ4.Internal;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -74,22 +75,34 @@ namespace DoaMaisAPI.Controllers
 
             return Ok(ONGs);
         }
-
         [HttpPut]
         [Route("atualizar")]
-        [Authorize]
         public IActionResult Atualizar([FromBody] ONGDTO ong)
         {
-            // Pegando ID do token
-            int id = int.Parse(HttpContext.User.FindFirst("id")?.Value);
-            ong.ID = id;
+            if (ong == null || ong.ID == 0)
+            {
+                return BadRequest("Invalid ONG data.");
+            }
 
-            var dao = new ONGDAO();
-            dao.Atualizar(ong);
+            try
+            {
 
-            return Ok();
+                if (string.IsNullOrWhiteSpace(ong.Base64) == false)
+                {
+                    var azureBlobStorage = new AzureBlobStorage();
+                    ong.FotoPerfil = azureBlobStorage.UploadImage(ong.Base64);
+                }
+
+                var dao = new ONGDAO();
+                dao.Atualizar(ong);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return StatusCode(500, "Internal server error");
+            }
         }
-
 
     }
 }
