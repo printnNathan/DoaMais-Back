@@ -1,6 +1,7 @@
 ﻿using DoaMaisAPI.DTO;
 using MySql.Data.MySqlClient;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace DoaMaisAPI.DAO
 {
@@ -10,8 +11,8 @@ namespace DoaMaisAPI.DAO
         {
             var conexao = ConnectionFactory.Build();
             conexao.Open();
-            var query = @"INSERT INTO ONGs (Nome, Celular, Email, Senha, Cep, Logradouro, Numero, Cidade, Bairro, Complemento, Estado, FotoPerfil, Biografia) 
-                        VALUES (@nome, @celular, @email, @senha, @cep, @logradouro, @numero, @cidade, @bairro, @complemento, @estado, @fotoperfil, @biografia)";
+            var query = @"INSERT INTO ONGs (Nome, Celular, Email, Senha, Cep, Logradouro, Numero, Cidade, Bairro, Complemento, Estado, FotoPerfil, Biografia, Validado) 
+                 VALUES (@nome, @celular, @email, @senha, @cep, @logradouro, @numero, @cidade, @bairro, @complemento, @estado, @fotoperfil, @biografia, @validado)";
             var comando = new MySqlCommand(query, conexao);
             comando.Parameters.AddWithValue("@nome", ong.Nome);
             comando.Parameters.AddWithValue("@celular", ong.Celular);
@@ -26,6 +27,7 @@ namespace DoaMaisAPI.DAO
             comando.Parameters.AddWithValue("@estado", ong.Estado);
             comando.Parameters.AddWithValue("@fotoperfil", ong.FotoPerfil);
             comando.Parameters.AddWithValue("@biografia", ong.Biografia);
+            comando.Parameters.AddWithValue("@validado", false);
             comando.ExecuteNonQuery();
             conexao.Close();
         }
@@ -84,7 +86,7 @@ namespace DoaMaisAPI.DAO
         {
             var conexao = ConnectionFactory.Build();
             conexao.Open();
-            var query = "SELECT * FROM ONGs WHERE email = @email and senha = @senha";
+            var query = "SELECT * FROM ONGs WHERE email = @email and senha = @senha and Validado  = 1";
             var comando = new MySqlCommand(query, conexao);
             comando.Parameters.AddWithValue("@email", ong.Email);
             comando.Parameters.AddWithValue("@senha", ong.Senha);
@@ -95,10 +97,14 @@ namespace DoaMaisAPI.DAO
                 ong.ID = int.Parse(dataReader["ID"].ToString());
                 ong.Email = dataReader["Email"].ToString();
                 ong.Senha = dataReader["Senha"].ToString();
+                ong.Validado = dataReader["Validado"] != DBNull.Value ? (bool?)Convert.ToBoolean(dataReader["Validado"]) : null; 
             }
             conexao.Close();
             return ong;
         }
+
+
+
 
         public ONGDTO ListarOngsPorID(int id)
         {
@@ -153,6 +159,20 @@ namespace DoaMaisAPI.DAO
                 }
             }
         }
+        public void ValidarONG(int id)
+        {
+            using (var conexao = ConnectionFactory.Build())
+            {
+                conexao.Open();
+                var query = "UPDATE ONGs SET Validado = TRUE WHERE ID = @id";
+                using (var comando = new MySqlCommand(query, conexao))
+                {
+                    comando.Parameters.AddWithValue("@id", id);
+                    comando.ExecuteNonQuery();
+                }
+            }
+        }
+
 
     }
 }

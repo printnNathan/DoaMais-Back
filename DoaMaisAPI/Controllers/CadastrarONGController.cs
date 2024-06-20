@@ -58,7 +58,6 @@ namespace DoaMaisAPI.Controllers
                 ong1.ID = int.Parse(dataReader["ID"].ToString());
                 ong1.Email = dataReader["Email"].ToString();
                 ong1.Senha = dataReader["Senha"].ToString();
-                //ong.ImagemURL = dataReader["ImagemURL"].ToString();
 
                 ong.Add(ong1);
             }
@@ -67,22 +66,33 @@ namespace DoaMaisAPI.Controllers
             return ong;
 
         }
-
         [HttpPost]
         [Route("Loginong")]
         public IActionResult LoginONG([FromForm] ONGDTO ong)
         {
             var dao = new ONGDAO();
             var usuarioLogado = dao.Login(ong);
-
             if (usuarioLogado.ID == 0)
             {
                 return NotFound("Usuário e/ou senha inválidos");
             }
 
+            // Verifica se o usuário está validado
+            bool validado = usuarioLogado.Validado.HasValue && usuarioLogado.Validado.Value;
+
             var token = GenerateJwtToken(usuarioLogado, "PU8a9W4sv2opkqlOwmgsn3w3Innlc4D5");
-            return Ok(new { token });
+            if (validado.validado == 1)
+            {
+                return Ok(new { token, validado });
+            }
+            else
+            {
+                return Ok(new { validado });
+            }
         }
+
+
+
 
         private string GenerateJwtToken(ONGDTO ong, string secretKey)
         {
@@ -106,5 +116,14 @@ namespace DoaMaisAPI.Controllers
             return new JwtSecurityTokenHandler().WriteToken(token);
 
         }
+        [HttpPost]
+        [Route("validarONG/{id}")]
+        public IActionResult ValidarONG(int id)
+        {
+            var dao = new ONGDAO();
+            dao.ValidarONG(id);
+            return Ok("ONG validada com sucesso");
+        }
+
     }
 }
