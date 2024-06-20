@@ -78,10 +78,10 @@ namespace DoaMaisAPI.Controllers
             }
 
             // Verifica se o usuário está validado
-            bool validado = usuarioLogado.Validado.HasValue && usuarioLogado.Validado.Value;
-
+            bool validado = usuarioLogado.Validado;
             var token = GenerateJwtToken(usuarioLogado, "PU8a9W4sv2opkqlOwmgsn3w3Innlc4D5");
-            if (validado.validado == 1)
+
+            if (validado)
             {
                 return Ok(new { token, validado });
             }
@@ -90,6 +90,8 @@ namespace DoaMaisAPI.Controllers
                 return Ok(new { validado });
             }
         }
+
+
 
 
 

@@ -81,12 +81,11 @@ namespace DoaMaisAPI.DAO
             conexao.Close();
             return ongs.Count > 0;
         }
-
         public ONGDTO Login(ONGDTO ong)
         {
             var conexao = ConnectionFactory.Build();
             conexao.Open();
-            var query = "SELECT * FROM ONGs WHERE email = @email and senha = @senha and Validado  = 1";
+            var query = "SELECT * FROM ONGs WHERE email = @email and senha = @senha";
             var comando = new MySqlCommand(query, conexao);
             comando.Parameters.AddWithValue("@email", ong.Email);
             comando.Parameters.AddWithValue("@senha", ong.Senha);
@@ -97,7 +96,7 @@ namespace DoaMaisAPI.DAO
                 ong.ID = int.Parse(dataReader["ID"].ToString());
                 ong.Email = dataReader["Email"].ToString();
                 ong.Senha = dataReader["Senha"].ToString();
-                ong.Validado = dataReader["Validado"] != DBNull.Value ? (bool?)Convert.ToBoolean(dataReader["Validado"]) : null; 
+                ong.Validado = dataReader["Validado"] != DBNull.Value && Convert.ToBoolean(dataReader["Validado"]);
             }
             conexao.Close();
             return ong;
