@@ -87,7 +87,7 @@ namespace DoaMaisAPI.Controllers
             }
             else
             {
-                return Ok(new { validado });
+                return StatusCode(428);
             }
         }
 
