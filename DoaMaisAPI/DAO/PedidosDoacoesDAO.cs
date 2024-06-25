@@ -9,25 +9,40 @@ namespace DoaMaisAPI.DAO
     {
         public void CadastrarPedidos(PedidoDoacaoDTO Pedidos)
         {
-            var conexao = ConnectionFactory.Build();
-            conexao.Open();
+            if (Pedidos == null)
+            {
+                throw new ArgumentNullException(nameof(Pedidos));
+            }
 
-            var query = @"INSERT INTO PedidosDoacao (Titulo, ID_Tipo, Descricao, ID_ONG, Status) 
-                         VALUES (@titulo, @id_tipo, @descricao, @id_ong, @status);
-                         SELECT LAST_INSERT_ID();";
+            if (Pedidos.ID_Tipo == null || Pedidos.ID_Tipo <= 0)
+            {
+                throw new ArgumentException("ID_Tipo não pode ser nulo", nameof(Pedidos.ID_Tipo));
+            }
 
-            var comando = new MySqlCommand(query, conexao);
-            comando.Parameters.AddWithValue("@titulo", Pedidos.Titulo);
-            comando.Parameters.AddWithValue("@id_tipo", Pedidos.ID_Tipo);
-            comando.Parameters.AddWithValue("@descricao", Pedidos.Descricao);
-            comando.Parameters.AddWithValue("@id_ong", Pedidos.ID_ONG);
-            comando.Parameters.AddWithValue("@status", Pedidos.Status);
+            using (var conexao = ConnectionFactory.Build())
+            {
+                conexao.Open();
 
-            var idPedido = Convert.ToInt32(comando.ExecuteScalar());
-            conexao.Close();
+                var query = @"INSERT INTO PedidosDoacao (Titulo, ID_Tipo, Descricao, ID_ONG, Status) 
+                      VALUES (@titulo, @id_tipo, @descricao, @id_ong, @status);
+                      SELECT LAST_INSERT_ID();";
 
-            CadastrarImagensPedido(idPedido, Pedidos.ImagensPedido);
+                using (var comando = new MySqlCommand(query, conexao))
+                {
+                    comando.Parameters.AddWithValue("@titulo", Pedidos.Titulo);
+                    comando.Parameters.AddWithValue("@id_tipo", Pedidos.ID_Tipo);
+                    comando.Parameters.AddWithValue("@descricao", Pedidos.Descricao);
+                    comando.Parameters.AddWithValue("@id_ong", Pedidos.ID_ONG);
+                    comando.Parameters.AddWithValue("@status", Pedidos.Status);
+
+                    var idPedido = Convert.ToInt32(comando.ExecuteScalar());
+                    conexao.Close();
+
+                    CadastrarImagensPedido(idPedido, Pedidos.ImagensPedido);
+                }
+            }
         }
+
         public List<PedidoDoacaoDTO> ListarPedidosDoacao()
         {
             var pedidos = new List<PedidoDoacaoDTO>();
@@ -55,6 +70,7 @@ namespace DoaMaisAPI.DAO
                         {
                             ID = dataReader.GetInt32("ID"),
                             Titulo = dataReader.GetString("Titulo"),
+                            ID_Tipo = dataReader.GetInt32("ID_Tipo"),
                             Descricao = dataReader.GetString("Descricao"),
                             ID_ONG = dataReader.GetInt32("ID_ONG"),
                             Status = dataReader.GetInt32("Status") == 1,
@@ -213,6 +229,7 @@ namespace DoaMaisAPI.DAO
                 var pedido = new PedidoDoacaoDTO();
                 pedido.ID = int.Parse(dataReader["ID"].ToString());
                 pedido.Titulo = dataReader["Titulo"].ToString();
+                pedido.ID_Tipo = int.Parse(dataReader["ID_Tipo"].ToString());
                 pedido.Descricao = dataReader["Descricao"].ToString();
                 pedido.ID_ONG = int.Parse(dataReader["ID_ONG"].ToString());
                 pedido.Status = Convert.ToInt32(dataReader["Status"]) == 1;
@@ -259,6 +276,7 @@ namespace DoaMaisAPI.DAO
                 var pedido = new PedidoDoacaoDTO();
                 pedido.ID = int.Parse(dataReader["ID"].ToString());
                 pedido.Titulo = dataReader["Titulo"].ToString();
+                pedido.ID_Tipo = int.Parse(dataReader["ID_Tipo"].ToString());
                 pedido.Descricao = dataReader["Descricao"].ToString();
                 pedido.ID_ONG = int.Parse(dataReader["ID_ONG"].ToString());
                 pedido.Status = Convert.ToInt32(dataReader["Status"]) == 1;
@@ -279,6 +297,68 @@ namespace DoaMaisAPI.DAO
             }
 
             conexao.Close();
+
+            return pedidos;
+        }
+        public List<PedidoDoacaoDTO> ListarPedidosPorTipo(int idTipo)
+        {
+            var pedidos = new List<PedidoDoacaoDTO>();
+
+            using (var conexao = ConnectionFactory.Build())
+            {
+                conexao.Open();
+
+                var query = @"SELECT 
+                        p.* , o.Nome,o.Celular,o.Email,o.Senha,o.Cep,o.Logradouro,
+                        o.Numero,o.Cidade,o.Bairro,o.Complemento,o.Estado,
+                        o.FotoPerfil,o.Biografia 
+                        FROM PedidosDoacao p
+                        INNER JOIN ONGs o
+                        ON p.ID_ONG = o.ID
+                        WHERE p.ID_Tipo = @idTipo AND p.Status = 1";
+
+                using (var comando = new MySqlCommand(query, conexao))
+                {
+                    comando.Parameters.AddWithValue("@idTipo", idTipo);
+
+                    using (var dataReader = comando.ExecuteReader())
+                    {
+                        while (dataReader.Read())
+                        {
+                            var pedido = new PedidoDoacaoDTO
+                            {
+                                ID = dataReader.GetInt32("ID"),
+                                Titulo = dataReader.GetString("Titulo"),
+                                ID_Tipo = dataReader.GetInt32("ID_Tipo"),
+                                Descricao = dataReader.GetString("Descricao"),
+                                ID_ONG = dataReader.GetInt32("ID_ONG"),
+                                Status = dataReader.GetInt32("Status") == 1,
+                                ImagensPedido = ListarImagensPedido(dataReader.GetInt32("ID"))
+                            };
+
+                            var ong = new ONGDTO();
+                            ong.ID = int.Parse(dataReader["ID"].ToString());
+                            ong.Nome = dataReader["Nome"].ToString();
+                            ong.Celular = dataReader["Celular"].ToString();
+                            ong.Email = dataReader["Email"].ToString();
+                            ong.Senha = dataReader["Senha"].ToString();
+                            ong.Cep = dataReader["Cep"].ToString();
+                            ong.Logradouro = dataReader["Logradouro"].ToString();
+                            ong.Numero = dataReader["Numero"].ToString();
+                            ong.Cidade = dataReader["Cidade"].ToString();
+                            ong.Bairro = dataReader["Bairro"].ToString();
+                            ong.Complemento = dataReader["Complemento"].ToString();
+                            ong.Estado = dataReader["Estado"].ToString();
+                            ong.FotoPerfil = dataReader["FotoPerfil"].ToString();
+                            ong.Biografia = dataReader["Biografia"].ToString();
+
+                            pedido.ONG = ong;
+
+                            pedidos.Add(pedido);
+                        }
+                    }
+                }
+            }
 
             return pedidos;
         }

@@ -4,7 +4,7 @@
     {
         public int ID { get; set; }
         public string Titulo { get; set; }
-        public int? ID_Tipo { get; set; }
+        public int ID_Tipo { get; set; }
         public string Descricao { get; set; }
         public int? ID_ONG { get; set; }
         public bool? Status { get; set; }

@@ -38,8 +38,6 @@ namespace DoaMaisAPI.Controllers
         [Route("cadastrarpedido")]
         public IActionResult CadastrarPedidos([FromBody] PedidoDoacaoDTO pedido)
         {
-
-
             var dao = new PedidosDoacoesDAO();
 
             if (pedido.ImagensPedido is not null)
@@ -54,6 +52,7 @@ namespace DoaMaisAPI.Controllers
             dao.CadastrarPedidos(pedido);
             return Ok();
         }
+
 
 
         [HttpGet]
@@ -133,6 +132,21 @@ namespace DoaMaisAPI.Controllers
             var pedidosPorONG = dao.ListarPedidosDoacaoPorONG(ongId);
 
             return Ok(pedidosPorONG);
+        }
+        [HttpGet]
+        [Route("porTipo/{idTipo}")]
+        public IActionResult ListarPedidosPorTipo(int idTipo)
+        {
+            try
+            {
+                var dao = new PedidosDoacoesDAO();
+                var pedidosPorTipo = dao.ListarPedidosPorTipo(idTipo);
+                return Ok(pedidosPorTipo);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Erro ao listar pedidos de doação por tipo", error = ex.Message });
+            }
         }
     }
 }
